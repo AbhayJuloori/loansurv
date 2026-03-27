@@ -221,7 +221,8 @@ loansurv/
 
 ### Model C — Random Survival Forest
 - Library: `scikit-survival.RandomSurvivalForest`
-- Hyperparameters: `n_estimators=300`, `max_features="sqrt"`, `min_samples_leaf=15`
+- **Trained on stratified 200k subsample** (preserving event rate) — full dataset used for KM and Cox PH only. scikit-survival's RSF lacks sklearn's optimizations; 300 trees on 1.8M rows would take 4–8+ hours and produce a multi-GB artifact.
+- Hyperparameters: `n_estimators=150`, `max_features="sqrt"`, `min_samples_leaf=15`
 - Permutation feature importance stored in `model_metadata.json`
 - **Default model for `/predict` endpoint** — best discrimination
 - No proportional hazards assumption required
@@ -345,7 +346,7 @@ GET    /health               → {"status": "ok"}
 **Dropdowns:** `--surface` background, 1px `--border`, 4px radius. Focus: border becomes `--accent`.
 
 ### Tech Stack
-React 18, Vite, React Router v6, React Query, Zustand, Recharts, Tailwind CSS v4, Axios, DM Sans + DM Mono (Google Fonts)
+React 18, Vite, React Router v6, React Query, Recharts, Tailwind CSS v3 (^3.4), Axios, DM Sans + DM Mono (Google Fonts)
 
 ---
 
