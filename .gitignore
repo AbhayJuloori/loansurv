@@ -1,0 +1,11 @@
+data/raw/
+data/processed/
+*.joblib
+*.pkl
+__pycache__/
+.env
+.venv/
+node_modules/
+dist/
+.DS_Store
+notebooks/.ipynb_checkpoints/
