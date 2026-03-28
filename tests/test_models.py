@@ -4,6 +4,8 @@ import numpy as np
 from src.data.loader import load_raw
 from src.data.survival_formatter import make_survival_df
 from src.models.kaplan_meier import KaplanMeierModel
+from src.data.preprocessor import Preprocessor
+from src.models.cox_ph import CoxModel
 
 
 @pytest.fixture(scope="session")
@@ -38,3 +40,39 @@ def test_km_save_load(km_df, tmp_path):
     c1 = km.predict_segment("grade", "A")
     c2 = km2.predict_segment("grade", "A")
     assert c1 == c2
+
+
+@pytest.fixture(scope="session")
+def model_df(raw_df):
+    """Fully preprocessed df with duration_months and event."""
+    df = make_survival_df(raw_df.copy())
+    p = Preprocessor()
+    features = p.fit_transform(raw_df.copy())
+    features["duration_months"] = df["duration_months"].values
+    features["event"] = df["event"].values
+    return features.dropna(subset=["duration_months", "event"])
+
+
+def test_cox_fits(model_df):
+    cox = CoxModel()
+    cox.fit(model_df)
+    assert cox._fitted
+
+
+def test_cox_predict_returns_curve(model_df):
+    cox = CoxModel()
+    cox.fit(model_df)
+    X = model_df.drop(columns=["duration_months", "event"]).iloc[:1]
+    curve = cox.predict_survival(X)
+    assert isinstance(curve, list)
+    assert all("month" in p and "probability" in p for p in curve)
+
+
+def test_cox_hazard_ratios(model_df):
+    cox = CoxModel()
+    cox.fit(model_df)
+    hrs = cox.get_hazard_ratios()
+    assert isinstance(hrs, dict)
+    assert len(hrs) > 0
+    for k, v in hrs.items():
+        assert "hr" in v and "lower" in v and "upper" in v
