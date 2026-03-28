@@ -1,6 +1,15 @@
-const MAX_W = 100 // max bar half-width in px
+const MAX_W = 110
 const RED   = 'rgba(220,38,38,0.65)'
 const GREEN = 'rgba(22,163,74,0.65)'
+
+function shortLabel(feat) {
+  const map = {
+    credit_line_age: 'cr_line_age',
+    log_annual_inc:  'log_income',
+    income_to_loan:  'inc/loan',
+  }
+  return map[feat] || feat
+}
 
 export default function HazardRatioChart({ hazardRatios }) {
   if (!hazardRatios || !Object.keys(hazardRatios).length) return null
@@ -11,7 +20,7 @@ export default function HazardRatioChart({ hazardRatios }) {
       hr:  v.hr,
       pct: Math.round((v.hr - 1) * 100),
     }))
-    .filter(e => Math.abs(e.pct) >= 2)
+    .filter(e => Math.abs(e.pct) >= 1)
     .sort((a, b) => Math.abs(b.pct) - Math.abs(a.pct))
     .slice(0, 10)
 
@@ -21,38 +30,45 @@ export default function HazardRatioChart({ hazardRatios }) {
 
   return (
     <div className="mt-5">
-      <p className="font-mono text-2xs uppercase tracking-widest text-text-muted mb-3">
+      {/* Section title in accent */}
+      <p className="font-mono uppercase text-accent mb-4"
+         style={{ fontSize: 11, letterSpacing: '0.1em' }}>
         Hazard Ratio Impact
       </p>
-      <div className="flex flex-col gap-2.5">
+
+      <div className="flex flex-col" style={{ gap: 10 }}>
         {entries.map(({ feat, pct }) => {
           const isRisk = pct > 0
-          const barW   = Math.round((Math.abs(pct) / maxAbs) * MAX_W)
+          const barW   = Math.max(3, Math.round((Math.abs(pct) / maxAbs) * MAX_W))
           const color  = isRisk ? RED : GREEN
-          const label  = isRisk ? `+${pct}%` : `${pct}%`
 
           return (
-            <div key={feat} className="flex items-center gap-2">
-              {/* feature label */}
-              <span className="font-mono text-xs text-text-muted w-28 flex-shrink-0 text-right truncate">
-                {feat}
+            <div key={feat} className="flex items-center" style={{ gap: 8, height: 32 }}>
+              {/* Feature label */}
+              <span
+                className="font-mono text-text-muted flex-shrink-0 text-right"
+                style={{ width: 100, fontSize: 13 }}
+              >
+                {shortLabel(feat)}
               </span>
 
-              {/* chart area */}
+              {/* Bar chart area */}
               <div
                 className="relative flex items-center flex-shrink-0"
-                style={{ width: MAX_W * 2 + 1 }}
+                style={{ width: MAX_W * 2 + 1, height: 32 }}
               >
-                {/* centre pivot */}
+                {/* Centre pivot */}
                 <div
                   className="absolute inset-y-0 bg-border"
                   style={{ left: MAX_W, width: 1 }}
                 />
-                {/* bar */}
+                {/* Bar */}
                 <div
                   className="absolute"
                   style={{
-                    height: 10,
+                    height: 14,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
                     width:  barW,
                     background: color,
                     borderRadius: 2,
@@ -63,18 +79,27 @@ export default function HazardRatioChart({ hazardRatios }) {
                 />
               </div>
 
-              {/* value */}
+              {/* Value */}
               <span
-                className="font-mono text-xs flex-shrink-0"
-                style={{ color: isRisk ? '#DC2626' : '#16A34A' }}
+                className="font-mono flex-shrink-0"
+                style={{
+                  fontSize: 13,
+                  color: isRisk ? '#DC2626' : '#16A34A',
+                  minWidth: 44,
+                }}
               >
-                {label}
+                {isRisk ? '+' : ''}{pct}%
               </span>
             </div>
           )
         })}
       </div>
-      <p className="font-mono text-2xs text-text-muted mt-3">
+
+      {/* Footnote in accent at 60% opacity, italic */}
+      <p
+        className="font-mono mt-4"
+        style={{ fontSize: 11, color: 'rgba(194,105,42,0.6)', fontStyle: 'italic' }}
+      >
         Relative change in default hazard vs. population mean. From Cox PH model.
       </p>
     </div>
