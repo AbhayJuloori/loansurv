@@ -6,6 +6,7 @@ from src.data.survival_formatter import make_survival_df
 from src.models.kaplan_meier import KaplanMeierModel
 from src.data.preprocessor import Preprocessor
 from src.models.cox_ph import CoxModel
+from src.models.rsf import RSFModel
 
 
 @pytest.fixture(scope="session")
@@ -76,3 +77,26 @@ def test_cox_hazard_ratios(model_df):
     assert len(hrs) > 0
     for k, v in hrs.items():
         assert "hr" in v and "lower" in v and "upper" in v
+
+
+def test_rsf_fits(model_df):
+    rsf = RSFModel()
+    rsf.fit(model_df, subsample_n=40)
+    assert rsf._fitted
+
+
+def test_rsf_predict_returns_curve(model_df):
+    rsf = RSFModel()
+    rsf.fit(model_df, subsample_n=40)
+    X = model_df.drop(columns=["duration_months", "event"]).iloc[:1]
+    curve = rsf.predict_survival(X)
+    assert isinstance(curve, list)
+    assert all("month" in p and "probability" in p for p in curve)
+
+
+def test_rsf_feature_importance(model_df):
+    rsf = RSFModel()
+    rsf.fit(model_df, subsample_n=40)
+    imp = rsf.get_feature_importance()
+    assert isinstance(imp, dict)
+    assert len(imp) > 0
