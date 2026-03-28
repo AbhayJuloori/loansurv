@@ -1,0 +1,21 @@
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_DIR=/app/models
+      - CORS_ORIGIN=http://localhost:3000
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+      args:
+        VITE_API_URL: ""          # empty = nginx proxy handles /api/*
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
