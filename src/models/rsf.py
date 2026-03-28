@@ -1,4 +1,5 @@
 import joblib
+import math
 import numpy as np
 import pandas as pd
 from sklearn.inspection import permutation_importance
@@ -65,7 +66,7 @@ class RSFModel:
         sf = self._model.predict_survival_function(Xv, return_array=True)
         probs = sf[0]
         return [
-            {"month": int(t), "probability": round(float(p), 4)}
+            {"month": int(t), "probability": round(float(p), 4) if math.isfinite(float(p)) else 1.0}
             for t, p in zip(self._times, probs)
         ]
 

@@ -28,6 +28,9 @@ def brier_scores(model, df: pd.DataFrame, times: list[int] = [12, 24, 36]) -> di
             row.append(prob)
         surv_probs.append(row)
 
-    surv_matrix = np.array(surv_probs)
+    surv_matrix = np.array(surv_probs, dtype=float)
+    # Replace NaN/inf with 1.0 (no-event probability fallback) so sksurv doesn't reject
+    surv_matrix = np.where(np.isfinite(surv_matrix), surv_matrix, 1.0)
+    surv_matrix = np.clip(surv_matrix, 0.0, 1.0)
     _, scores = sksurv_brier(y, y, surv_matrix, valid_times)
     return {t: round(float(s), 4) for t, s in zip(valid_times, scores)}

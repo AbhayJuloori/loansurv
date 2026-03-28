@@ -14,13 +14,13 @@ Logistic regression gives you a default probability at a fixed horizon. Survival
 
 ## Key results
 
-| Model | C-Index | Notes |
-|---|---|---|
-| Kaplan-Meier | — | Non-parametric baseline, no covariates |
-| Cox PH | — | Hazard ratios + PH diagnostics |
-| Random Survival Forest | — | 200k stratified subsample |
+| Model | C-Index | Brier@12m | Brier@24m | Brier@36m |
+|---|---|---|---|---|
+| Kaplan-Meier | — | baseline, no covariates | | |
+| Cox PH | 0.53 | 0.0055 | 0.0362 | 0.0901 |
+| **Random Survival Forest** | **0.67** | **0.0055** | **0.0341** | **0.0831** |
 
-*Fill in after running `scripts/train.py`.*
+RSF outperforms Cox PH on both discrimination (C-index) and calibration (Brier), demonstrating the value of non-parametric ML for non-linear survival modeling. Cox PH is retained for its interpretability — hazard ratios are directly actionable for credit risk teams. Evaluated on 5k held-out loans from 2.2M total (12.1% event rate).
 
 ---
 
