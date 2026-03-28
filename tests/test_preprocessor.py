@@ -1,5 +1,8 @@
+import pandas as pd
+
 from src.data.loader import load_raw, LEAKAGE_COLS
 from src.data.survival_formatter import make_survival_df
+from src.data.preprocessor import Preprocessor
 
 
 def test_loader_drops_leakage(raw_df, tmp_path):
@@ -44,3 +47,31 @@ def test_survival_formatter_drops_date_cols(raw_df):
     df = make_survival_df(raw_df.copy())
     assert "issue_d" not in df.columns
     assert "earliest_cr_line" not in df.columns
+
+
+def test_preprocessor_output_columns(raw_df):
+    p = Preprocessor()
+    out = p.fit_transform(raw_df.copy())
+    expected = ["fico_mid", "log_annual_inc", "income_to_loan", "credit_line_age",
+                "grade", "term", "dti", "int_rate", "revol_util", "revol_bal",
+                "loan_amnt", "pub_rec", "delinq_2yrs", "emp_length", "open_acc"]
+    for col in expected:
+        assert col in out.columns, f"Missing column: {col}"
+
+
+def test_preprocessor_no_nulls(raw_df):
+    p = Preprocessor()
+    out = p.fit_transform(raw_df.copy())
+    feature_cols = [c for c in out.columns if c not in ("duration_months", "event", "loan_status")]
+    assert out[feature_cols].isnull().sum().sum() == 0
+
+
+def test_preprocessor_save_load(raw_df, tmp_path):
+    p = Preprocessor()
+    p.fit(raw_df.copy())
+    path = str(tmp_path / "preprocessor.joblib")
+    p.save(path)
+    p2 = Preprocessor.load(path)
+    out1 = p.transform(raw_df.copy())
+    out2 = p2.transform(raw_df.copy())
+    pd.testing.assert_frame_equal(out1, out2)
