@@ -26,7 +26,7 @@ input[type="range"] {
   appearance: none;
   width: 100%;
   height: 3px;
-  background: #E2DDD8;
+  background: linear-gradient(to right, #C2692A var(--pct, 50%), #E2DDD8 var(--pct, 50%));
   border-radius: 2px;
   outline: none;
   cursor: pointer;

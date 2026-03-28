@@ -26,7 +26,7 @@ export default function BorrowerAnalysis() {
   }, [predict])
 
   return (
-    <div className="flex" style={{ height: 'calc(100vh - 48px)' }}>
+    <div className="flex" style={{ height: 'calc(100vh - 56px)' }}>
 
       {/* ── Left: form panel ─────────────────────────────── */}
       <div
@@ -49,7 +49,8 @@ export default function BorrowerAnalysis() {
         <div className="flex-1 px-6 py-5">
           {/* Chart header */}
           <div className="flex items-center justify-between mb-3">
-            <p className="font-mono text-2xs uppercase tracking-widest text-text-muted">
+            <p className="font-mono uppercase text-accent"
+               style={{ fontSize: 11, letterSpacing: '0.1em' }}>
               Survival Function — P(no default by month t)
             </p>
             {isPending && (
