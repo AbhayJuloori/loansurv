@@ -1,9 +1,20 @@
 import { useState, useEffect } from 'react'
 
 const GRADES      = ['A','B','C','D','E','F','G']
-const PURPOSES    = ['debt_consolidation','credit_card','home_improvement',
-                     'major_purchase','small_business','medical','other']
-const OWNERSHIPS  = ['RENT','OWN','MORTGAGE']
+const PURPOSES    = [
+  { value: 'debt_consolidation', label: 'Debt Consolidation' },
+  { value: 'credit_card',        label: 'Credit Card' },
+  { value: 'home_improvement',   label: 'Home Improvement' },
+  { value: 'major_purchase',     label: 'Major Purchase' },
+  { value: 'small_business',     label: 'Small Business' },
+  { value: 'medical',            label: 'Medical' },
+  { value: 'other',              label: 'Other' },
+]
+const OWNERSHIPS  = [
+  { value: 'RENT',     label: 'Rent' },
+  { value: 'OWN',      label: 'Own' },
+  { value: 'MORTGAGE', label: 'Mortgage' },
+]
 const EMP_LENGTHS = ['< 1 year','1 year','2 years','3 years','4 years',
                      '5 years','6 years','7 years','8 years','9 years','10+ years']
 
@@ -20,7 +31,7 @@ function SectionLabel({ children }) {
 
 function FieldLabel({ children }) {
   return (
-    <span className="font-mono text-text-muted" style={{ fontSize: 13 }}>
+    <span className="font-mono text-text-muted" style={{ fontSize: 12 }}>
       {children}
     </span>
   )
@@ -32,7 +43,7 @@ function SliderField({ label, value, min, max, step = 1, format, onChange }) {
     <div className="flex flex-col gap-1">
       <div className="flex justify-between items-baseline">
         <FieldLabel>{label}</FieldLabel>
-        <span className="font-mono text-text-primary" style={{ fontSize: 13 }}>
+        <span className="font-mono font-500 text-text-primary" style={{ fontSize: 13 }}>
           {format ? format(value) : value}
         </span>
       </div>
@@ -43,6 +54,14 @@ function SliderField({ label, value, min, max, step = 1, format, onChange }) {
         style={{ '--pct': `${pct}%` }}
         onChange={e => onChange(parseFloat(e.target.value))}
       />
+      <div className="flex justify-between">
+        <span className="font-mono text-text-muted" style={{ fontSize: 10 }}>
+          {format ? format(min) : min}
+        </span>
+        <span className="font-mono text-text-muted" style={{ fontSize: 10 }}>
+          {format ? format(max) : max}
+        </span>
+      </div>
     </div>
   )
 }
@@ -57,9 +76,11 @@ function SelectField({ label, value, options, onChange }) {
         className="bg-surface border border-border text-text-primary font-sans w-full px-2"
         style={{ borderRadius: 4, fontSize: 13, height: 36 }}
       >
-        {options.map(o => (
-          <option key={String(o)} value={String(o)}>{String(o)}</option>
-        ))}
+        {options.map(o => {
+          const val = typeof o === 'object' ? o.value : String(o)
+          const lbl = typeof o === 'object' ? o.label : String(o)
+          return <option key={val} value={val}>{lbl}</option>
+        })}
       </select>
     </div>
   )
@@ -78,12 +99,19 @@ export default function BorrowerForm({ defaults, onChange }) {
     onChange?.(next)
   }
 
+  function reset() {
+    if (defaults && Object.keys(defaults).length) {
+      setForm(defaults)
+      onChange?.(defaults)
+    }
+  }
+
   return (
     <div className="flex flex-col px-4 py-4 overflow-y-auto h-full" style={{ gap: 12 }}>
 
       <SectionLabel>Loan Details</SectionLabel>
       <SelectField
-        label="Grade" value={form.grade || 'C'} options={GRADES}
+        label="Credit Grade" value={form.grade || 'C'} options={GRADES}
         onChange={v => update({ grade: v })}
       />
       <SelectField
@@ -111,7 +139,7 @@ export default function BorrowerForm({ defaults, onChange }) {
         onChange={v => update({ annual_inc: v })}
       />
       <SliderField
-        label="DTI" value={form.dti || 18}
+        label="DTI (%)" value={form.dti || 18}
         min={0} max={50} step={0.5}
         format={v => `${Number(v).toFixed(1)}%`}
         onChange={v => update({ dti: v })}
@@ -127,7 +155,7 @@ export default function BorrowerForm({ defaults, onChange }) {
         onChange={v => update({ home_ownership: v })}
       />
       <SelectField
-        label="Purpose" value={form.purpose || 'debt_consolidation'}
+        label="Loan Purpose" value={form.purpose || 'debt_consolidation'}
         options={PURPOSES}
         onChange={v => update({ purpose: v })}
       />
@@ -157,6 +185,17 @@ export default function BorrowerForm({ defaults, onChange }) {
         format={v => Math.round(v)}
         onChange={v => update({ open_acc: v })}
       />
+
+      {/* Reset button */}
+      <div className="mt-2 pt-3 border-t border-border">
+        <button
+          onClick={reset}
+          className="font-mono text-text-muted w-full py-2 border border-border transition-all duration-150 hover:text-text-primary hover:border-text-muted cursor-pointer"
+          style={{ fontSize: 12, borderRadius: 4 }}
+        >
+          Reset to defaults
+        </button>
+      </div>
 
     </div>
   )

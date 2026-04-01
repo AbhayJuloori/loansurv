@@ -9,7 +9,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Nav />
-      <main className="bg-bg min-h-screen" style={{ paddingTop: 56 }}>
+      <main className="bg-bg min-h-screen" style={{ paddingTop: 60 }}>
         <Routes>
           <Route path="/"            element={<BorrowerAnalysis />} />
           <Route path="/cohort"      element={<CohortExplorer />}   />

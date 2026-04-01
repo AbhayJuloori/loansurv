@@ -16,9 +16,12 @@ export function medianSurvival(curve) {
 }
 
 // Merge multi-cohort curves into a single recharts dataset keyed by month
-export function mergeCohortCurves(cohorts) {
+// Capped at 60 months to match stated observation window
+export function mergeCohortCurves(cohorts, maxMonth = 60) {
   const monthSet = new Set()
-  cohorts.forEach(({ curve }) => curve?.forEach(p => monthSet.add(p.month)))
+  cohorts.forEach(({ curve }) =>
+    curve?.filter(p => p.month <= maxMonth).forEach(p => monthSet.add(p.month))
+  )
   const months = [...monthSet].sort((a, b) => a - b)
   return months.map(month => {
     const row = { month }
