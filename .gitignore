@@ -1,11 +1,54 @@
-data/raw/
-data/processed/
-*.joblib
-*.pkl
+# Python
 __pycache__/
-.env
-.venv/
-node_modules/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
 dist/
+build/
+.venv/
+venv/
+env/
+*.egg
+
+# Data — too large to store in git
+data/
+*.parquet
+*.csv
+
+# Trained models — too large (use DVC or download separately)
+models/*.joblib
+# Keep metadata
+!models/model_metadata.json
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Frontend build artifacts
+app/node_modules/
+app/dist/
+
+# macOS
 .DS_Store
-notebooks/.ipynb_checkpoints/
+**/.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+/tmp/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb

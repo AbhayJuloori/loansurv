@@ -45,14 +45,25 @@ def predict(features: BorrowerFeatures, request: Request,
     return result
 
 
+_SEGMENT_TYPES = {"grade", "term", "purpose", "home_ownership"}
+
+
+def _parse_segment(segment: str):
+    for seg_type in sorted(_SEGMENT_TYPES, key=len, reverse=True):
+        if segment.startswith(seg_type + "_"):
+            seg_value = segment[len(seg_type) + 1:]
+            return seg_type, seg_value
+    raise ValueError(f"Unknown segment type in: {segment}")
+
+
 @router.get("/cohort/{segment}", response_model=CohortResponse)
 def cohort(segment: str, request: Request):
-    parts = segment.split("_", 1)
-    if len(parts) != 2:
-        raise HTTPException(400, "Segment format: {type}_{value}")
-    seg_type, seg_value = parts
+    try:
+        seg_type, seg_value = _parse_segment(segment)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
     km = request.app.state.km_model
-    val = int(seg_value) if seg_type == "term" else seg_value.replace("_", " ")
+    val = int(seg_value) if seg_type == "term" else seg_value
     curve = km.predict_segment(seg_type, str(val))
     pvalue = km.get_logrank_pvalue(seg_type)
     return CohortResponse(segment=segment, curve=curve, logrank_pvalue=pvalue)
