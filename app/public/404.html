@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+  // GitHub Pages SPA redirect: store path in sessionStorage, redirect to index
+  var path = window.location.pathname;
+  var base = '/loansurv';
+  var rest = path.replace(base, '') || '/';
+  sessionStorage.setItem('spa_redirect', rest + window.location.search);
+  window.location.replace(base + '/');
+</script>
+</head>
+</html>

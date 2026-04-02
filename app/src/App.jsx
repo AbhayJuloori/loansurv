@@ -7,7 +7,7 @@ import Methodology from './pages/Methodology'
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Nav />
       <main className="bg-bg min-h-screen" style={{ paddingTop: 60 }}>
         <Routes>
