@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  base: command === 'build' ? '/loansurv/' : '/',
   plugins: [react()],
   build: {
     chunkSizeWarningLimit: 800,
@@ -23,4 +24,4 @@ export default defineConfig({
       }
     }
   }
-})
+}))
