@@ -14,7 +14,7 @@ Most default models answer a binary question: *will this borrower default?* But 
 
 ## Live demo
 
-**[loansurv.vercel.app](https://loansurv.vercel.app)** — frontend on Vercel, API on Railway.
+**[abhayjuloori.github.io/loansurv](https://abhayjuloori.github.io/loansurv/)** — hosted on GitHub Pages, runs entirely in the browser.
 
 ---
 
