@@ -1,7 +1,15 @@
 import { useState } from 'react'
 import { useQueries } from '@tanstack/react-query'
-import axios from 'axios'
 import CohortComparison from '../components/CohortComparison'
+
+const MODEL_DATA_URL = import.meta.env.BASE_URL + 'model_data.json'
+let _modelDataPromise = null
+function loadModelData() {
+  if (!_modelDataPromise) {
+    _modelDataPromise = fetch(MODEL_DATA_URL).then(r => r.json())
+  }
+  return _modelDataPromise
+}
 
 const SEG_TYPES = {
   grade: {
@@ -69,8 +77,13 @@ export default function CohortExplorer() {
   const queries = useQueries({
     queries: values.map(val => ({
       queryKey: ['cohort', segType, val],
-      queryFn: () =>
-        axios.get(`/api/cohort/${segType}_${val}`).then(r => r.data),
+      queryFn: async () => {
+        const modelData = await loadModelData()
+        const key = `${segType}_${val}`
+        const curve = modelData.km?.[key] ?? []
+        const pvalue = modelData.pvalues?.[segType] ?? null
+        return { segment: key, curve, logrank_pvalue: pvalue }
+      },
       staleTime: Infinity,
     })),
   })
@@ -91,7 +104,6 @@ export default function CohortExplorer() {
         className="flex-shrink-0 border-r border-border bg-surface flex flex-col px-5 py-6"
         style={{ width: 280 }}
       >
-        {/* Page title */}
         <h1 className="font-mono font-600 text-text-primary mb-1" style={{ fontSize: 15 }}>
           Cohort Explorer
         </h1>
@@ -100,7 +112,6 @@ export default function CohortExplorer() {
           Each curve shows the probability a cohort <em>survives</em> (doesn't default) over 60 months.
         </p>
 
-        {/* How to read section */}
         <div className="mb-5 border-t border-border pt-4">
           <p className="font-mono uppercase text-accent mb-2" style={{ fontSize: 11, letterSpacing: '0.1em' }}>
             How to read this
@@ -127,7 +138,6 @@ export default function CohortExplorer() {
           </ul>
         </div>
 
-        {/* Segment selector */}
         <div className="mb-5">
           <p className="font-mono uppercase text-accent mb-2" style={{ fontSize: 11, letterSpacing: '0.1em' }}>
             Segment by
@@ -155,7 +165,6 @@ export default function CohortExplorer() {
           )}
         </div>
 
-        {/* Statistical significance */}
         <div className="border-t border-border pt-4">
           <p className="font-mono uppercase text-accent mb-2" style={{ fontSize: 11, letterSpacing: '0.1em' }}>
             Statistical Test
@@ -185,7 +194,6 @@ export default function CohortExplorer() {
 
         <CohortComparison cohorts={cohorts} />
 
-        {/* Footnote */}
         <p className="font-sans text-text-muted mt-4" style={{ fontSize: 12, lineHeight: 1.5 }}>
           Curves estimated using the Kaplan-Meier method on 1.8M Lending Club loans (2007–2018).
           Fully-paid loans before term end are treated as right-censored: they survived at least that long,
