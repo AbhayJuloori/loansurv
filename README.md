@@ -1,6 +1,6 @@
 # LoanSurv
 
-**Survival analysis for loan default risk** — modeling *when* borrowers default, not just *if*.
+**Survival analysis for loan default risk**: modeling *when* borrowers default, not just *if*.
 
 Built on 2.2M Lending Club loans (2007–2018). Two models run in parallel: a **Cox Proportional Hazards** model for interpretable hazard ratios, and a **Random Survival Forest** for non-linear predictive accuracy. A FastAPI backend serves real-time predictions; a React dashboard lets you explore individual borrower risk, cohort comparisons by grade or purpose, and model performance metrics.
 
@@ -8,13 +8,13 @@ Built on 2.2M Lending Club loans (2007–2018). Two models run in parallel: a **
 
 ## Why this project matters
 
-Most default models answer a binary question: *will this borrower default?* But that framing discards timing entirely — a loan that defaults in month 3 has fundamentally different economics than one that defaults in month 33, even though both carry the same 36-month default flag. Credit risk teams price loans, set loss reserves, and stress-test portfolios against *time-to-default distributions*, not point-in-time probabilities. Survival analysis is the right statistical framework for this: it produces full survival curves, median default timing, and hazard rates at any horizon, under arbitrary right-censoring. This project applies that framework end-to-end — from raw CSV to a deployed interactive dashboard — demonstrating how production-grade survival modeling differs from standard binary classification.
+Most default models answer a binary question: *will this borrower default?* But that framing discards timing entirely. A loan that defaults in month 3 has fundamentally different economics than one that defaults in month 33, even though both carry the same 36-month default flag. Credit risk teams price loans, set loss reserves, and stress-test portfolios against *time-to-default distributions*, not point-in-time probabilities. Survival analysis is the right statistical framework for this: it produces full survival curves, median default timing, and hazard rates at any horizon, under arbitrary right-censoring. This project applies that framework end-to-end, from raw CSV to a deployed interactive dashboard, demonstrating how production-grade survival modeling differs from standard binary classification.
 
 ---
 
 ## Live demo
 
-**[abhayjuloori.github.io/loansurv](https://abhayjuloori.github.io/loansurv/)** — hosted on GitHub Pages, runs entirely in the browser.
+**[abhayjuloori.github.io/loansurv](https://abhayjuloori.github.io/loansurv/)**: hosted on GitHub Pages, runs entirely in the browser.
 
 ---
 
@@ -27,7 +27,7 @@ Evaluated on a stratified 2,000-row holdout (12.1% event rate). Brier scores mea
 | Cox Proportional Hazards | 0.526 | 0.0086 | 0.0410 | 0.121 |
 | **Random Survival Forest** | **0.651** | **0.0085** | **0.0395** | **0.114** |
 
-Cox PH C-index is constrained by the dataset: 88% of loans are censored via early prepayment, and early payoffs are systematically low-risk — a violation of the independent censoring assumption that sets a practical ceiling around 0.54 even for a single strong feature like loan grade. RSF handles this censoring structure better through non-parametric splits. Published LC survival analysis papers report Cox C-index 0.52–0.62 and RSF 0.63–0.71 on comparable data. Cox is retained for hazard ratio interpretability, not prediction ranking.
+Cox PH C-index is constrained by the dataset: 88% of loans are censored via early prepayment, and early payoffs are systematically low-risk, a violation of the independent censoring assumption that sets a practical ceiling around 0.54 even for a single strong feature like loan grade. RSF handles this censoring structure better through non-parametric splits. Published LC survival analysis papers report Cox C-index 0.52–0.62 and RSF 0.63–0.71 on comparable data. Cox is retained for hazard ratio interpretability, not prediction ranking.
 
 ---
 
@@ -62,10 +62,10 @@ Processes the raw CSV, engineers features, trains Cox PH and RSF, saves everythi
 ### Run locally
 
 ```bash
-# Terminal 1 — API (http://localhost:8000)
+# Terminal 1: API (http://localhost:8000)
 PYTHONPATH=. python3 -m uvicorn src.api.main:app --reload
 
-# Terminal 2 — Frontend (http://localhost:5173)
+# Terminal 2: Frontend (http://localhost:5173)
 cd app && npm install && npm run dev
 ```
 
@@ -88,9 +88,9 @@ Raw CSV (1.6 GB)
     │
     ▼
 src/data/
-  loader.py               — ingest and clean raw CSV
-  survival_formatter.py   — construct duration_months + event flag
-  preprocessor.py         — 15 engineered features, z-score scaling
+  loader.py                ingest and clean raw CSV
+  survival_formatter.py    construct duration_months + event flag
+  preprocessor.py          15 engineered features, z-score scaling
     │
     ▼
 data/processed/loans.parquet  (2.2M rows)
